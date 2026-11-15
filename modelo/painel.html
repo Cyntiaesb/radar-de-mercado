@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{TITULO}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Papel, serifa, placar em blocos, abas de pasta em cima e subabas sublinhadas, com uma análise por aba. Dados no objeto D, no fim. */
+:root{
+  --papel:#F3EFE4; --folha:#FBF9F3; --tinta:#16140F; --cinza:#6F6A5E; --linha:#DED8C8;
+  --laranja:#E5622A; --pessego:#F6E4D4; --verde:#7E9A57; --verdeC:#EEF2E4; --azul:#4A5BD4; --alerta:#B8452A; --alertaC:#FBEDE6; --amarelo:#E3B341;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--papel);color:var(--tinta);font:14px/1.5 var(--sans);margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 80px}
+.exemplo{background:var(--tinta);color:var(--folha);font:500 11px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;padding-block:9px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between}
+.exemplo b{color:var(--laranja);font-weight:500}
+
+/* abas de pasta */
+.vistas{display:flex;flex-wrap:wrap;margin-bottom:14px;border-bottom:1px solid var(--linha)}
+.vistas button{font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:10px 16px;border:1px solid transparent;border-bottom:0;background:none;color:var(--cinza);cursor:pointer;margin-bottom:-1px}
+.vistas button:hover{color:var(--tinta)}
+.vistas button[aria-selected="true"]{background:var(--folha);color:var(--tinta);border-color:var(--linha)}
+.subabas{display:flex;flex-wrap:wrap;margin:-6px 0 18px;border-bottom:1px solid var(--linha)}
+.subabas button{font:500 12px var(--sans);padding:8px 14px;border:0;border-bottom:2px solid transparent;background:none;color:var(--cinza);cursor:pointer;margin-bottom:-1px}
+.subabas button[aria-selected="true"]{color:var(--tinta);border-bottom-color:var(--laranja)}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--laranja);outline-offset:2px}
+
+.folha{background:var(--folha);border:1px solid var(--linha);padding:26px 28px}
+@media (max-width:600px){.folha{padding:18px 16px}}
+.eyebrow{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between;font:500 10px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cinza)}
+.eyebrow b{color:var(--tinta);font-weight:500}
+h1{font:400 clamp(32px,5vw,52px)/1.05 var(--serif);letter-spacing:-.02em;margin:14px 0 14px;text-wrap:balance}
+h1 em{font-style:italic;color:var(--laranja)}
+h2{font:400 26px/1.15 var(--serif);margin:4px 0 4px;text-wrap:balance}
+h3{font:400 21px/1.2 var(--serif);margin:28px 0 4px}
+.lbl{font:500 9.5px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cinza)}
+.nums{font:400 12px var(--mono);color:var(--cinza);margin:6px 0 14px}
+.nums b{color:var(--tinta);font-weight:500}
+.lede{max-width:72ch;margin:0 0 14px;color:#3b382f;font-size:14.5px}
+.rodape{font:400 10.5px/1.6 var(--mono);color:var(--cinza);margin-top:18px}
+.fonte{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 16px}
+.fonte span{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--linha);padding:5px 7px;color:var(--cinza)}
+
+.bloco-pagos{background:var(--tinta);color:var(--folha);padding:18px 20px;margin-bottom:16px}
+.bloco-pagos .lbl{color:#B9B3A3}
+.bloco-pagos h2{color:var(--folha)}
+.bloco-pagos p{margin:0;font-size:13px;color:#D9D3C3;max-width:82ch}
+.bloco-pagos b{color:var(--laranja);font-weight:600}
+
+/* placar */
+.tiles{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:10px;margin-bottom:18px}
+@media (max-width:760px){.tiles{grid-template-columns:1fr 1fr}}
+.tile{border:1px solid var(--linha);padding:12px 14px;background:var(--folha);min-width:0}
+.tile .n{font:500 26px/1.1 var(--sans);margin-top:8px;font-variant-numeric:tabular-nums}
+.tile .n small{font-size:11px;color:var(--cinza);font-weight:400}
+.tile p{margin:4px 0 0;font-size:12px;color:var(--cinza)}
+.tile.preto{background:var(--tinta);color:var(--folha);border-color:var(--tinta)}
+.tile.preto .lbl,.tile.preto p{color:#B9B3A3}
+.tile.custo{background:var(--pessego);border-color:#EBC9AE}
+.tile.ruim{background:var(--alertaC);border-color:#EFC9B8}
+
+.filtros{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;align-items:center}
+.filtros button{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:7px 10px;border:1px solid var(--linha);background:var(--folha);color:var(--tinta);cursor:pointer}
+.filtros button[aria-pressed="true"]{background:var(--tinta);color:var(--folha);border-color:var(--tinta)}
+
+/* achados */
+.achados{display:grid;gap:10px;counter-reset:a}
+.achado{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;border:1px solid var(--linha);background:var(--folha);padding:14px 16px;counter-increment:a}
+.achado::before{content:counter(a,decimal-leading-zero);font:400 28px/1 var(--serif);color:var(--laranja)}
+.achado b{display:block;font-weight:600;margin-bottom:4px;font-size:15px}
+.achado p{margin:0;color:#3b382f}
+
+/* tabelas */
+.tw{overflow-x:auto}
+.lista{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+.lista th{font:500 9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cinza);text-align:left;border-bottom:1px solid var(--linha);padding:6px;white-space:nowrap}
+.lista td{border-bottom:1px solid var(--linha);padding:7px 6px;vertical-align:top}
+.lista td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.lista tr.cli td{background:var(--verdeC);font-weight:500}
+.pill{display:inline-block;font:500 10px var(--mono);padding:2px 6px;border:1px solid var(--linha);white-space:nowrap}
+.pill.ok{background:#E7EED9;border-color:#C9D6B2}
+.pill.meio{background:#F8EDCF;border-color:#E9D49A}
+.pill.inc{background:#F6DED6;border-color:#E8BBAA;color:var(--alerta)}
+.pill.t{background:var(--tinta);border-color:var(--tinta);color:var(--folha)}
+.bol{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.bol::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--linha);flex:none}
+.bol.sim::before{background:var(--verde)}.bol.meio::before{background:var(--amarelo)}.bol.nao::before{background:#CFC8B6}
+
+/* cartões de gente */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;margin-top:12px}
+.pessoa{border:1px solid var(--linha);background:var(--folha);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pessoa .topo{display:flex;gap:12px;align-items:center;min-width:0}
+.avatar{flex:none;width:52px;height:52px;border-radius:50%;background:#E7E1D2;border:1px solid var(--linha);display:grid;place-items:center;font:500 18px var(--serif);color:var(--cinza)}
+.pessoa .quem{min-width:0}
+.pessoa .quem b{display:block;font:600 14px/1.25 var(--sans)}
+.pessoa .quem .link{font:500 11px var(--mono);color:var(--azul)}
+.pessoa .como{display:flex;flex-wrap:wrap;gap:4px}
+.pessoa .por{font-size:12.5px;color:#3b382f;line-height:1.45;margin:0}
+.nums3{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--linha);padding-top:8px;margin-top:auto}
+.nums3 b{display:block;font:500 15px var(--sans);font-variant-numeric:tabular-nums}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{border:1px solid var(--linha);padding:6px 9px;font:400 11px var(--mono);background:var(--folha)}
+.tag b{font-weight:500;color:var(--tinta)}.tag span{color:var(--cinza)}
+
+/* estudo de concorrentes */
+.conc-dupla{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px;margin-top:14px}
+@media (max-width:860px){.conc-dupla{grid-template-columns:1fr}}
+svg.grafico{display:block;width:100%;height:auto;margin-top:8px}
+.q{fill:var(--folha);stroke:var(--linha)}.q.ouro{fill:var(--verdeC);stroke:var(--verde);stroke-dasharray:4 3}
+.ax{font:500 10px var(--mono);fill:var(--cinza);letter-spacing:.06em}
+.qt{font:italic 400 13px var(--serif);fill:var(--cinza)}.qt.ouro{fill:var(--verde)}
+.bola{stroke:var(--folha);stroke-width:2;fill:var(--alerta)}.bola.cli{fill:var(--verde)}
+.nm{font:500 11px var(--sans);fill:var(--tinta)}.nm.cli{font-weight:700;fill:var(--verde)}
+.linhaP{stroke:var(--tinta);stroke-width:1.5}
+.tk{font:400 10px var(--mono);fill:var(--cinza)}
+.vl{font:400 10.5px var(--mono);fill:var(--cinza)}
+.legenda-c{font-size:12px;color:var(--cinza);margin:6px 0 0}
+.espacos{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:10px}
+.espaco{background:var(--tinta);color:var(--folha);padding:14px 16px}
+.espaco b{display:block;font:500 15px/1.3 var(--sans);margin-bottom:6px}
+.espaco p{margin:0 0 8px;font-size:12.5px;line-height:1.5;color:#D9D3C3}
+.espaco .id{font:500 10.5px var(--mono);color:var(--laranja)}
+.conc-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:14px;margin-top:10px}
+.cc{--cor:var(--alerta);background:#fff;border:1px solid var(--linha);border-top:5px solid var(--cor);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.cc.latam{--cor:var(--azul)}
+.cc header{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center}
+.cc .av{width:52px;height:52px;border-radius:50%;background:var(--cor);color:#fff;display:grid;place-items:center;font:500 20px var(--serif);box-shadow:0 0 0 3px #fff,0 0 0 4px var(--cor)}
+.cc h4{font:600 15px/1.25 var(--sans);margin:0}
+.cc .onde{font-size:11.5px;color:var(--cinza);margin-top:2px}
+.cc .etq{font:600 18px/1 var(--sans);font-variant-numeric:tabular-nums;background:var(--pessego);padding:8px 10px;border:1px dashed var(--laranja);transform:rotate(3deg);white-space:nowrap;text-align:center}
+.cc .etq small{display:block;font:500 8.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--cinza);margin-bottom:3px}
+.cc .prom{margin:0;font:italic 400 18px/1.3 var(--serif);padding-left:14px;border-left:3px solid var(--cor)}
+.cc .medid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.med .lbl{display:flex;justify-content:space-between}
+.med .tr{height:8px;background:var(--papel);border-radius:4px;margin-top:5px;overflow:hidden}
+.med .tr i{display:block;height:100%;background:var(--cor);border-radius:4px}
+.trilha{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.trilha span{font-size:11.5px;line-height:1.3;background:var(--papel);border:1px solid var(--linha);padding:5px 9px;border-radius:14px}
+.trilha span:last-child{background:var(--tinta);color:var(--folha);border-color:var(--tinta)}
+.trilha b{color:var(--cor);font:500 13px var(--mono)}
+.info{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;margin:0;font-size:12.5px;line-height:1.45}
+.info dt{font:500 9.5px/1.9 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cinza)}
+.info dd{margin:0;color:#3b382f}
+.brecha{background:var(--alertaC);border:1px solid #EFC9B8;padding:10px 12px;font-size:12.5px;line-height:1.45;color:#6b2a17;margin-top:auto}
+.brecha .lbl{color:var(--alerta);margin-bottom:4px}
+.clone{font-size:12px;color:var(--alerta)}
+
+/* produtos */
+.produto{border-left:4px solid var(--alerta)}
+.produto.cli{border-left-color:var(--verde);background:var(--verdeC)}
+.produto h4{font:600 15px/1.3 var(--sans);margin:0}
+.preco{font:600 24px/1.1 var(--sans);font-variant-numeric:tabular-nums}
+.fatos{display:flex;flex-wrap:wrap;gap:4px}
+
+/* reputação */
+.rep-dupla{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+@media (max-width:860px){.rep-dupla{grid-template-columns:1fr}}
+.canal{display:grid;grid-template-columns:150px minmax(0,1fr) 90px;gap:12px;padding:10px 0;border-top:1px solid var(--linha);align-items:center}
+@media (max-width:600px){.canal{grid-template-columns:1fr 80px}.canal .sent{grid-column:1/-1}}
+.canal b{display:block;font:600 13px var(--sans)}.canal span{font-size:11px;color:var(--cinza)}
+.sent{display:flex;height:12px;border:1px solid var(--linha)}
+.sent i{display:block;height:100%}
+.sent .p{background:var(--verde)}.sent .n{background:#D7D0BE}.sent .r{background:var(--alerta)}
+.canal .v{font:500 12px var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+.queixa{border:1px solid var(--linha);background:var(--folha);padding:12px 14px;display:grid;gap:6px}
+.queixa .top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.queixa q{font:italic 400 16px/1.4 var(--serif);quotes:"“" "”"}
+.queixa small{font:400 10.5px var(--mono);color:var(--cinza)}
+.queixa.bom{border-left:3px solid var(--verde)}.queixa.ruim{border-left:3px solid var(--alerta)}
+.temas{display:grid;gap:8px;margin-top:8px}
+
+/* barras */
+.barras{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.barra{display:grid;grid-template-columns:minmax(90px,200px) 1fr 64px;gap:10px;align-items:center;font-size:12.5px}
+.barra .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.barra .t{height:10px;background:var(--linha);position:relative}.barra .t i{position:absolute;inset:0 auto 0 0;background:var(--azul)}
+.barra .t i.claro{background:#B8BEEA}
+.barra.cli .t i{background:var(--laranja)}.barra.cli .n{color:var(--laranja);font-weight:600}
+.barra.ruim .t i{background:var(--alerta)}
+.barra .v{font:400 11px var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+.yt-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+@media (max-width:760px){.yt-kpis{grid-template-columns:1fr 1fr}}
+.dupla2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;margin-top:18px}
+@media (max-width:860px){.dupla2{grid-template-columns:1fr}}
+.ferr{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.ferr input{font:13px var(--sans);border:1px solid var(--linha);background:var(--folha);color:var(--tinta);padding:7px 9px;flex:1 1 220px;min-width:0}
+
+/* decode de reels */
+.dupla{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px;margin-top:14px}
+@media (max-width:860px){.dupla{grid-template-columns:1fr}}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px;margin-top:8px}
+.cap{position:relative;aspect-ratio:9/16;max-width:100%;border:0;padding:6px 5px;cursor:pointer;color:var(--folha);text-align:left;font:500 8.5px/1.25 var(--sans);display:flex;align-items:flex-end;overflow:hidden}
+.cap[aria-current="true"]{outline:2px solid var(--laranja);outline-offset:1px}
+.cap .br{position:absolute;left:2px;top:2px;font:500 8px var(--mono);background:var(--tinta);color:var(--folha);padding:1px 3px}
+.cap .isc{position:absolute;right:3px;top:3px;width:8px;height:8px;border-radius:50%;background:var(--laranja)}
+.cap.apaga{opacity:.25}
+.dentro{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;align-items:start;margin-top:8px}
+.dentro .foto{aspect-ratio:9/16;max-width:100%;padding:8px;color:var(--folha);font:400 14px/1.25 var(--serif);display:flex;align-items:flex-end}
+.campo{border-bottom:1px solid var(--linha);padding:6px 0 8px}
+.campo .val{font:500 17px/1.25 var(--sans);margin-top:2px}
+.campo .val small{font:400 11px var(--mono);color:var(--cinza)}
+.citacao{font:italic 400 15px/1.45 var(--serif);margin:12px 0 6px;color:#2b281f}
+.padroes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:10px}
+@media (max-width:760px){.padroes{grid-template-columns:1fr 1fr}}
+.pad .nome{display:flex;justify-content:space-between;font:500 13px var(--sans)}
+.pad .tr{height:3px;background:var(--linha);margin-top:6px}.pad .tr i{display:block;height:100%;background:var(--verde)}
+.pad .sub{font-size:10.5px;color:var(--cinza);margin-top:4px}
+.evid{background:var(--tinta);color:var(--folha);padding:14px 16px;margin-top:14px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.evid{grid-template-columns:1fr 1fr}}
+.evid .lbl{color:#B9B3A3}.evid .v{font:500 16px var(--sans);margin-top:4px}
+.evid .v small{display:block;font:400 10.5px var(--mono);color:#B9B3A3;margin-top:2px}
+
+/* anúncios */
+.anuncios-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:12px}
+.anuncio{border:1px solid var(--linha);background:var(--folha);display:flex;flex-direction:column;min-width:0}
+.anuncio.cli{border-color:var(--verde);background:var(--verdeC)}
+.anuncio .img{aspect-ratio:1/1;max-width:100%;display:flex;align-items:flex-end;padding:12px;color:var(--folha);font:400 18px/1.25 var(--serif);border-bottom:1px solid var(--linha)}
+.anuncio .corpo{padding:10px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.anuncio .quem{font:600 13px var(--sans)}
+.anuncio .txt{font-size:12px;color:#3b382f}
+.anuncio .meta{display:flex;flex-wrap:wrap;gap:4px}
+.anuncio .dias{font:600 18px var(--sans);font-variant-numeric:tabular-nums}
+.anuncio .dias small{font:400 10.5px var(--mono);color:var(--cinza)}
+.grupo-tema{font:400 22px/1.2 var(--serif);margin:26px 0 2px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.grupo-tema span{font:400 11px var(--mono);color:var(--cinza)}
+.ficha dl{margin:0;display:grid;grid-template-columns:100px minmax(0,1fr);gap:4px 10px;font-size:12.5px}
+.ficha dt{font:500 9.5px/1.9 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cinza)}
+.ficha dd{margin:0}
+
+/* calendário */
+.cal td,.cal th{text-align:center}
+.cal td:first-child,.cal th:first-child{text-align:left;white-space:nowrap}
+.cal .x{display:inline-block;font:500 10px/1 var(--mono);padding:4px 5px;background:var(--tinta);color:var(--folha)}
+.cal .x.bf{background:var(--laranja)}
+.cal th.bf{color:var(--laranja)}
+
+/* público e posicionamento */
+.duas{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px}
+.cit{margin:0;border-left:3px solid var(--laranja);background:var(--folha);padding:10px 14px;font:italic 400 16px/1.45 var(--serif)}
+.cit small{display:block;font:400 10.5px var(--mono);font-style:normal;color:var(--cinza);margin-top:4px}
+.lex{display:flex;flex-wrap:wrap;gap:6px}
+.lex span{font-size:13px;padding:5px 9px;border:1px solid var(--linha);background:var(--folha)}
+.lex.ruim span{text-decoration:line-through;color:var(--cinza)}
+.persona{background:var(--tinta);color:var(--folha);padding:18px 20px;font:400 18px/1.5 var(--serif)}
+.persona small{display:block;font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--laranja);margin-bottom:8px}
+.persona dl{display:grid;grid-template-columns:130px minmax(0,1fr);gap:6px 12px;font:400 13px/1.45 var(--sans);margin:14px 0 0;color:#D9D3C3}
+.persona dt{font:500 9.5px/1.9 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#B9B3A3}
+.persona dd{margin:0}
+.eixos{display:grid;gap:10px;counter-reset:e}
+.eixo{display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;border:1px solid var(--linha);background:var(--folha);padding:14px 16px;counter-increment:e}
+.eixo::before{content:counter(e);width:32px;height:32px;border-radius:50%;border:1px solid var(--tinta);display:grid;place-items:center;font:500 13px var(--mono)}
+.eixo h4{margin:0;font:600 15px var(--sans)}
+.eixo .o{margin:4px 0 0;font:italic 400 16px/1.4 var(--serif)}
+.camadas3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+@media (max-width:760px){.camadas3{grid-template-columns:1fr}}
+.camadas3 div{font-size:12.5px;line-height:1.45;padding:8px 10px;background:var(--papel);border:1px solid var(--linha)}
+.camadas3 div .lbl{display:block;margin-bottom:3px}
+.camadas3 div:last-child{background:var(--tinta);color:var(--folha);border-color:var(--tinta)}
+.camadas3 div:last-child .lbl{color:var(--laranja)}
+.fato{font:500 9.5px var(--mono);letter-spacing:.08em;padding:1px 5px;border:1px solid var(--linha);margin-left:6px;vertical-align:2px}
+.fato.inf{border-style:dashed}
+.frase{border:2px solid var(--tinta);background:var(--folha);padding:20px 22px;font:400 clamp(20px,2.6vw,28px)/1.3 var(--serif)}
+.frase small{display:block;font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cinza);margin-bottom:8px}
+.alt{display:grid;gap:8px;margin-top:10px}
+.alt div{border:1px dashed var(--linha);padding:10px 14px;font-size:13px;background:var(--folha)}
+.cartao{border:1px solid var(--linha);background:var(--folha);padding:14px 16px;min-width:0}
+.cartao.lar{border-color:var(--laranja)}
+.cartao p{margin:6px 0 0;font-size:13px}
+.mec{background:var(--tinta);color:var(--folha);padding:18px 20px;margin-top:14px}
+.mec .lbl{color:var(--laranja)}
+.mec b{display:block;font:400 24px/1.25 var(--serif);margin:6px 0}
+.mec p{margin:0;color:#D9D3C3;font-size:13px;max-width:80ch}
+.check{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.check li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;font-size:13px;padding:8px 10px;background:var(--folha);border:1px solid var(--linha)}
+.check li::before{content:"";width:14px;height:14px;border:1.5px solid var(--tinta);margin-top:2px}
+
+/* funis */
+.fluxo{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;margin-top:14px}
+.no{flex:1 1 150px;border:1px solid var(--tinta);background:var(--folha);min-width:0;position:relative;margin:0 18px 12px 0}
+.no::after{content:"→";position:absolute;right:-16px;top:50%;transform:translateY(-50%);font:500 14px var(--mono)}
+.no:last-child::after{content:""}
+.no .f{background:var(--tinta);color:#E9E3D3;font:500 9.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:4px 8px}
+.no b{display:block;font:600 13px var(--sans);padding:8px 8px 2px}
+.no span{display:block;font-size:11.5px;color:var(--cinza);padding:0 8px 8px}
+.no.alerta{background:#F6DED6;border-color:var(--alerta)}.no.alerta .f{background:var(--alerta)}
+.no.live{background:var(--pessego);border-color:var(--laranja)}.no.live .f{background:var(--laranja)}
+.no.venda{background:var(--verdeC);border-color:var(--verde)}.no.venda .f{background:var(--verde)}
+.ramo{border:1px dashed var(--alerta);background:#FBF1EC;padding:12px 14px;margin-top:6px;font-size:12.5px}
+.ramo b{color:var(--alerta)}
+.fase{display:flex;align-items:baseline;gap:10px;margin:20px 0 6px;border-bottom:1px solid var(--tinta);padding-bottom:4px;flex-wrap:wrap}
+.fase b{font:500 15px var(--sans)}.fase span{font:400 10.5px var(--mono);color:var(--cinza);text-transform:uppercase;letter-spacing:.08em}
+.msg{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px;padding:10px 0;border-bottom:1px solid var(--linha)}
+@media (max-width:700px){.msg{grid-template-columns:1fr;gap:6px}}
+.mmeta{display:flex;flex-direction:column;gap:3px;font-size:12px}
+.mmeta .cod{align-self:flex-start;font:500 10px var(--mono);background:var(--tinta);color:var(--folha);padding:2px 6px}
+.mmeta b{font:600 13px var(--sans)}
+.balao{background:var(--folha);border:1px solid var(--linha);border-left:3px solid var(--tinta);padding:10px 12px;font-size:13px;line-height:1.55;white-space:pre-line;max-width:68ch}
+.msg.venda .balao{border-left-color:var(--verde);background:var(--verdeC)}.msg.venda .mmeta .cod{background:var(--verde)}
+.semana{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:10px}
+@media (max-width:760px){.semana{grid-template-columns:repeat(2,1fr)}}
+.dia{border:1px solid var(--linha);padding:8px;font-size:11.5px;min-height:92px;background:var(--folha)}
+.dia .d{font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cinza)}
+.dia .m{margin-top:5px}
+.dia.live{border-color:var(--laranja);background:var(--pessego)}
+.dia.venda{border-color:var(--verde);background:var(--verdeC)}
+.dia.mudo{opacity:.5}
+.trilho{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}
+@media (max-width:980px){.trilho{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.trilho{grid-template-columns:1fr}}
+.raia{border:1px solid var(--linha);background:var(--folha);display:flex;flex-direction:column;min-width:0}
+.raia>header{background:var(--tinta);color:var(--folha);padding:10px 12px}
+.raia>header .lbl{color:#B9B3A3}.raia>header b{display:block;font:500 15px var(--sans);margin-top:3px}
+.passo{padding:10px 12px;border-top:1px solid var(--linha);font-size:12.5px;line-height:1.45}
+.passo b{display:block;font:600 13px var(--sans);margin:2px 0}
+.passo .sinal{font:400 10.5px var(--mono);color:var(--cinza);margin-top:4px}
+.passo.alerta{background:#F6DED6}
+.metas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
+@media (max-width:760px){.metas{grid-template-columns:1fr 1fr}}
+
+/* conteúdos */
+.ideia{display:grid;grid-template-columns:44px minmax(0,1fr) 150px;gap:14px;padding:16px 0;border-top:1px solid var(--linha)}
+@media (max-width:700px){.ideia{grid-template-columns:32px minmax(0,1fr)}.ideia .selos{grid-column:2;flex-direction:row;flex-wrap:wrap}}
+.ideia .num{font:400 26px/1 var(--serif);color:var(--cinza)}
+.ideia h4{font:600 16px/1.3 var(--sans);margin:0 0 6px}
+.ideia .abre{font:italic 400 17px/1.4 var(--serif);color:#2b281f;margin:0 0 8px}
+.ideia .linha{font-size:13px;line-height:1.5;color:#3b382f;margin:2px 0}
+.ideia .linha b{font-weight:600;color:var(--tinta)}
+.selos{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.selo{font:500 11.5px var(--sans);padding:3px 9px;border:1px solid var(--linha);background:var(--folha);white-space:nowrap}
+.selo.alto{background:var(--tinta);color:var(--folha);border-color:var(--tinta)}
+.selo.bom{background:var(--pessego);border-color:#EBC9AE}
+/* estudo: selo de confiança, veredito, limites, preço por formato, fontes */
+.selo-c{display:inline-block;font:500 9.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:4px 6px;margin:0 0 6px;border:1px solid var(--linha);color:var(--cinza)}
+.selo-c.alta{background:var(--verdeC);border-color:#C9D6B2;color:#4d6331}
+.selo-c.moderada{background:#F8EDCF;border-color:#E9D49A;color:#7a5a12}
+.selo-c.baixa{background:var(--alertaC);border-color:#EFC9B8;color:var(--alerta)}
+.geral{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;border:1px solid var(--linha);background:var(--folha);padding:12px 14px;margin:0 0 22px;font-size:13px}
+.geral .selo-c{margin:0}.geral p{margin:0;flex:1 1 260px;color:#3b382f}
+.vd{display:inline-block;font:500 10px var(--mono);padding:3px 7px;white-space:nowrap;border:1px solid var(--linha)}
+.vd.confirmada{background:var(--verdeC);border-color:#C9D6B2;color:#4d6331}
+.vd.parte{background:#F8EDCF;border-color:#E9D49A;color:#7a5a12}
+.vd.divergente{background:var(--alertaC);border-color:#EFC9B8;color:var(--alerta)}
+.vd.semlastro{background:#EDEAE1;color:var(--cinza)}
+.limites{margin:8px 0 0;padding:0 0 0 18px;display:grid;gap:5px;font-size:13px;color:#3b382f}
+.fmt-topo{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-top:26px}
+.lnk{color:var(--azul);text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+.fontes-tipos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:0 0 8px}
+.fontes-tipos b{display:block;font:400 26px/1.1 var(--serif);margin-top:4px}
+@media (prefers-reduced-motion:no-preference){#vista{animation:entra .2s ease-out}@keyframes entra{from{opacity:.5}to{opacity:1}}}
+</style>
+
+<div class="exemplo"><span><b>{{SELO}}</b> · coletados {{COLETA}} · cada número com a fonte</span><span>"Leitura nossa" = interpretação · "não coletado" = falta buscar</span></div>
+<div class="wrap">
+  <nav class="vistas" role="tablist" aria-label="Abas do painel" id="tabs"></nav>
+  <main id="vista"></main>
+  <p class="rodape">Toda conta deste painel (contagens, médias, dias no ar, diferença de preço, sentimento) sai de script, nunca da IA. Preço, anúncio e reclamação levam a data em que foram vistos. A biblioteca da Meta não mostra gasto: tempo no ar é o sinal de anúncio vencedor. "Leitura nossa" é interpretação, não dado.</p>
+</div>
+
+<script>
+/* ===================== DADOS · {{CABECALHO}} =====================
+   Gerado por scripts/monta_painel.py a partir de especialistas/<slug>.py. Não editar à mão:
+   trocar os dados no arquivo do especialista e rodar o script de novo. "nc" = não coletado. */
+/*__D__*/
+
+/* ===================== helpers ===================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+const brl = n => "R$ " + n.toLocaleString("pt-BR", {minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2});
+const ini = n => n.replace(/[^\p{L} ]/gu,"").split(" ").filter(Boolean).slice(0,2).map(p => p[0]).join("");
+const fonte = a => `<div class="fonte">${a.map(f => `<span>${esc(f)}</span>`).join("")}</div>`;
+const C = D.cli, K = D.conc, PUB = K.filter(c => c.grupo === "publico"), FORM = K.filter(c => c.grupo === "formacao"), LOJA = K.filter(c => c.grupo === "loja");
+const G = () => D.grupos || {publico:"público final", formacao:"formação", loja:"loja íntima"};
+const GL = (c, cap) => { const t = G()[c.grupo] + (c.secular ? " · secular" : "") + (c.ref ? " · referência" : ""); return cap ? t[0].toUpperCase() + t.slice(1) : t; };
+const contaGrupos = negrito => Object.keys(G()).filter(g => K.some(c => c.grupo === g)).map(g => (negrito ? `<b>${K.filter(c => c.grupo === g).length}</b>` : K.filter(c => c.grupo === g).length) + " " + G()[g]).join(" · ");
+const cap = s => s[0].toUpperCase() + s.slice(1);
+const subs = (id, lista) => `<div class="subabas" role="tablist" data-grupo="${id}">${lista.map(([k,t],i) => `<button type="button" role="tab" data-sub="${k}" aria-selected="${i===0}">${t}</button>`).join("")}</div>`;
+const painel = (k, html, ativo) => `<div data-painel="${k}"${ativo ? "" : " hidden"}>${html}</div>`;
+const barra = (n, v, mx, txt, cls="") => `<div class="barra ${cls}"><span class="n">${esc(n)}</span><div class="t" role="img" aria-label="${esc(txt)}"><i style="width:${Math.max(1, v/mx*100)}%"></i></div><span class="v">${esc(txt)}</span></div>`;
+const nomeDe = id => id === "cli" ? C.nome : (K.find(c => c.id === id) || {}).nome;
+
+/* ===================== abas ===================== */
+const ABAS = [
+["resumo","Resumo", () => `<section class="folha">
+  <div class="eyebrow"><span>Análise macro de mercado · <b>${esc(C.nome)}</b> · ${esc(C.at)}</span><b>coletado em ${D.data}</b></div>
+  <h1>${D.txt.h1}</h1>
+  <p class="lede">${esc(C.titulo)}. Quem disputa o mesmo público, por quanto vende, o que falam ${C.dela}, onde anuncia, quando tem evento, como o público fala e como os funis estão hoje.</p>
+  ${geralHtml()}
+  <div class="tiles">
+    <div class="tile preto"><div class="lbl">Instagram · YouTube</div><div class="n">${C.seg} <small>· ${C.yt} no YouTube</small></div></div>
+    <div class="tile"><div class="lbl">Produtos e eventos próprios</div><div class="n">${D.produtos.length}</div><p>${esc(D.txt.faixaProdutos)}</p></div>
+    <div class="tile custo"><div class="lbl">Concorrentes estudados</div><div class="n">${K.length}</div><p>${contaGrupos()}</p></div>
+    <div class="tile ruim"><div class="lbl">${esc(D.txt.tile4[0])}</div><div class="n">${esc(D.txt.tile4[1])}</div><p>${esc(D.txt.tile4[2])}</p></div>
+  </div>
+  ${achadosHtml()}
+  <div class="lbl" style="margin:26px 0 4px">O que este painel não sabe</div>
+  ${limitesHtml()}
+</section>`],
+
+["quem","Quem estudamos", () => {
+  const W = 560, H = 380, m = 40, px = x => m + x*(W-2*m);
+  const ly = v => { const a = Math.log10(30), b = Math.log10(8000); return H - m - (Math.log10(v)-a)/(b-a)*(H-2*m); };
+  const pts = [...K, {id:"cli", nome:C.nome, x:D.cliMapa.x, preco_y:D.cliMapa.preco_y}].filter(c => c.preco_y);
+  const mapa = `<svg class="grafico" viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa: horizontal de só conteúdo online a presencial e formação; vertical, maior preço publicado">
+    <rect class="q" x="${m}" y="${m}" width="${(W-2*m)/2}" height="${(H-2*m)/2}"/><rect class="q ouro" x="${W/2}" y="${m}" width="${(W-2*m)/2}" height="${(H-2*m)/2}"/>
+    <rect class="q" x="${m}" y="${H/2}" width="${(W-2*m)/2}" height="${(H-2*m)/2}"/><rect class="q" x="${W/2}" y="${H/2}" width="${(W-2*m)/2}" height="${(H-2*m)/2}"/>
+    <text class="qt ouro" x="${W-m-8}" y="${m+18}" text-anchor="end">${esc(D.txt.mapa[2])}</text>
+    <text class="ax" x="${m}" y="${H-12}">${esc(D.txt.mapa[0])}</text><text class="ax" x="${W-m}" y="${H-12}" text-anchor="end">${esc(D.txt.mapa[1])}</text>
+    ${[100,500,1000,5000].map(v => `<text class="tk" x="${m-4}" y="${ly(v)+3}" text-anchor="end">${v>=1000 ? v/1000+" mil" : v}</text>`).join("")}
+    ${pts.map(p => `<circle class="bola ${p.id==="cli"?"cli":""}" cx="${px(p.x)}" cy="${ly(p.preco_y)}" r="${p.id==="cli"?9:7}"/><text class="nm ${p.id==="cli"?"cli":""}" x="${px(p.x) > W-140 ? px(p.x)-12 : px(p.x)+11}" y="${ly(p.preco_y)+4}" text-anchor="${px(p.x) > W-140 ? "end":"start"}">${esc(p.nome.split(" ").slice(0,2).join(" "))}</text>`).join("")}
+  </svg>`;
+  const comPreco = [...K.filter(c => c.preco), ...D.cliPrecos.map(p => ({id:"cli", nome:p[0], preco:p[1]}))].sort((a,b) => a.preco - b.preco);
+  const mx = Math.max(...comPreco.map(p => p.preco)) * 1.05, rx = v => 30 + v/mx*500, hR = comPreco.length*30+40;
+  const regua = !comPreco.length ? `<p class="legenda-c">Ninguém publica preço: nada pra pôr na régua.</p>` : `<svg class="grafico" viewBox="0 0 560 ${hR}" role="img" aria-label="Régua de preços"><line class="linhaP" x1="30" y1="${hR-30}" x2="530" y2="${hR-30}"/>
+    ${[0,.25,.5,.75,1].map(f => Math.round(mx/1.05*f)).map(t => `<text class="tk" x="${rx(t)}" y="${hR-12}" text-anchor="middle">${t ? (t >= 1000 ? (t/1000).toLocaleString("pt-BR",{maximumFractionDigits:1})+" mil" : "R$ "+t) : "R$ 0"}</text>`).join("")}
+    ${comPreco.map((p,i) => { const x = rx(p.preco), dir = x > 360; return `<line x1="${x}" y1="${i*30+20}" x2="${x}" y2="${hR-30}" stroke="#DED8C8" stroke-dasharray="2 3"/><circle class="bola ${p.id==="cli"?"cli":""}" cx="${x}" cy="${i*30+20}" r="6"/><text class="nm ${p.id==="cli"?"cli":""}" x="${dir?x-10:x+10}" y="${i*30+18}" text-anchor="${dir?"end":"start"}">${esc(p.nome)}</text><text class="vl" x="${dir?x-10:x+10}" y="${i*30+30}" text-anchor="${dir?"end":"start"}">${brl(p.preco)}</text>`; }).join("")}
+  </svg>`;
+  const card = c => `<article class="cc ${c.grupo==="formacao"?"latam":""}">
+    <header><div class="av" aria-hidden="true">${ini(c.nome)}</div><div><h4>${esc(c.nome)}</h4><div class="onde">${esc(c.at)} · ${GL(c)}</div></div><div class="etq"><small>Maior preço</small>${c.preco ? brl(c.preco) : "—"}</div></header>
+    <p class="prom">${esc(c.promessa)}</p>
+    <div class="medid"><div class="med"><div class="lbl"><span>YouTube</span><b>${esc(c.yt)}</b></div><div class="tr"><i style="width:${Math.min(100,c.ytn/30*100)}%"></i></div></div>
+      <div class="med"><div class="lbl"><span>Instagram</span><b>${c.seg==="nc"?"não coletado":esc(c.seg)}</b></div><div class="tr"><i style="width:0"></i></div></div></div>
+    <div><div class="lbl" style="margin-bottom:5px">Como vende</div><div class="trilha">${c.funil.map((f,i) => `<span>${esc(f)}</span>${i < c.funil.length-1 ? "<b>→</b>" : ""}`).join("")}</div></div>
+    <dl class="info"><dt>Por que entrou</dt><dd>${esc(c.motivo)}</dd><dt>Produto</dt><dd>${esc(c.produto)} · ${esc(c.precoTxt)}</dd><dt>Garantia</dt><dd>${esc(c.garantia)}</dd><dt>Escada</dt><dd>${esc(c.degrau)}</dd></dl>
+    <div class="brecha"><div class="lbl">Onde é fraco · leitura nossa</div>${esc(c.fraco)}</div></article>`;
+  const linhas = [{nome:C.nome+" (cliente)", cli:true, yt:C.yt, ...D.cliLinha}, ...K.map(c => ({nome:c.nome, maior:c.preco ? brl(c.preco) : "—", gar:c.garantia, yt:c.yt, escada:c.degrau, vende:c.funil.join(" → ")}))];
+  return `<section class="folha">
+  ${subs("quem", [["varremos","Quem varremos"],["conc","Estudo de concorrentes"]])}
+  ${painel("varremos", `<div class="lbl">Mercado · quem entrou na coleta</div><h2>Quem varremos e por quê</h2>
+    ${fonte(["Busca web","Páginas de venda","YouTube"])}
+    <p class="nums"><b>${K.length}</b> concorrentes · ${contaGrupos(true)} · ${esc(D.txt.varremosFora)}</p>
+    <div class="cards">${K.map(c => `<div class="pessoa"><div class="topo"><div class="avatar" aria-hidden="true">${ini(c.nome)}</div><div class="quem"><b>${esc(c.nome)}</b><span class="link">${esc(c.at)}</span></div></div>
+      <div class="como"><span class="pill ${c.grupo==="publico"?"t":""}">${GL(c,1)}</span><span class="pill">${esc(c.origem)}</span></div>
+      <p class="por">${esc(c.motivo)}</p>
+      <div class="nums3"><div><span class="lbl">Instagram</span><b>${c.seg==="nc"?"—":esc(c.seg.split(" (")[0])}</b></div><div><span class="lbl">YouTube</span><b>${esc(c.yt)}</b></div><div><span class="lbl">Maior preço</span><b>${c.preco?brl(c.preco):"—"}</b></div></div></div>`).join("")}</div>
+    <p class="rodape">Seguidores no Instagram: só entra o número visto de forma legítima (perfil aberto ou imprensa). Os outros ficam "—" até a coleta com login.</p>`, true)}
+  ${painel("conc", `<div class="lbl">Estudo de concorrentes</div><h2>Quem vende parecido, e onde ${C.ela} está ${C.sozinha}</h2>
+    ${fonte([`Páginas de venda e checkouts (${D.data})`,"YouTube","Imprensa"])}
+    <div class="conc-dupla"><div><div class="lbl">Onde cada um está · leitura nossa</div>${mapa}<p class="legenda-c">${D.txt.legendaMapa}</p></div>
+      <div><div class="lbl">Quanto cada um cobra</div>${regua}</div></div>
+    <div class="lbl" style="margin-top:22px">Lado a lado</div>
+    <div class="tw"><table class="lista"><thead><tr><th>Quem</th><th>Maior preço</th><th>Garantia</th><th>YouTube</th><th>Escada</th><th>Como vende</th></tr></thead><tbody>
+    ${linhas.map(l => `<tr class="${l.cli?"cli":""}"><td>${esc(l.nome)}</td><td class="num">${esc(l.maior)}</td><td>${esc(l.gar)}</td><td class="num">${esc(l.yt)}</td><td>${esc(l.escada)}</td><td>${esc(l.vende)}</td></tr>`).join("")}</tbody></table></div>
+    <div class="lbl" style="margin-top:26px">Onde ${C.ela} está ${C.sozinha} e onde está ${C.exposta} · leitura nossa</div>
+    <div class="espacos">${D.espacos.map(e => `<div class="espaco"><span class="id">${esc(e[0])}</span><b>${esc(e[1])}</b><p>${esc(e[2])}</p></div>`).join("")}</div>
+    ${Object.keys(G()).filter(g => K.some(c => c.grupo === g)).map(g => `<h3>${esc((D.gruposTitulo || {})[g] || cap(G()[g]))}</h3><div class="conc-grade">${K.filter(c => c.grupo === g).map(card).join("")}</div>`).join("")}`)}
+</section>`;
+}],
+
+["produtos","Produtos e preços", () => `<section class="folha">
+  <div class="bloco-pagos"><div class="lbl">O que ${C.ela} vende hoje</div><h2>${esc(D.txt.produtosH2)}</h2>
+  <p>Preço tirado da página ou do checkout em ${D.data}. <b>Preço que não está na página fica como "não publicado"</b>, nunca estimado.</p></div>
+  ${fonte(D.txt.fontesProdutos)}
+  <div class="cards">${D.produtos.map(p => `<div class="pessoa produto cli"><span class="pill" style="align-self:flex-start">${esc(p.grupo)}</span><h4>${esc(p.nome)}</h4>
+    <div class="preco ${p.preco?"":"nd"}" style="${p.preco?"":"font:500 13px var(--mono);color:var(--alerta)"}">${p.preco ? brl(p.preco) : "Não publicado"}</div><p class="por" style="margin:0">${esc(p.txt)}</p>
+    <div class="fatos">${p.fatos.map(f => `<span class="pill">${esc(f)}</span>`).join("")}</div><p class="por">${esc(p.por)}</p><span class="rodape" style="margin:0">${esc(p.fonte)}</span></div>`).join("")}</div>
+  <div class="lbl" style="margin-top:26px">${cap(C.ela)} × concorrentes · produto principal</div>
+  <div class="tw"><table class="lista"><thead><tr><th>Quem</th><th>Produto</th><th>Preço</th><th>Garantia</th><th>Bônus</th><th>Escada</th></tr></thead><tbody>
+  <tr class="cli">${D.txt.cliProdutoLinha.map((v,i) => `<td${i===2?' class="num"':""}>${esc(v)}</td>`).join("")}</tr>
+  ${K.map(c => `<tr><td>${esc(c.nome)}</td><td>${esc(c.produto)}</td><td class="num">${esc(c.precoTxt)}</td><td>${esc(c.garantia)}</td><td>${esc(c.bonus)}</td><td>${esc(c.degrau)}</td></tr>`).join("")}</tbody></table></div>
+  ${formatosHtml()}
+</section>`],
+
+["reputacao","Reputação", () => { const r = D.rep, mxT = Math.max(...r.temas.map(t => t[1])); return `<section class="folha">
+  ${subs("rep", [["cliente",`O que falam ${C.dela}`],["conc","Dos concorrentes"],["nicho","Do que o nicho reclama"]])}
+  ${painel("cliente", `<div class="lbl">Reputação · ${esc(C.cnpj)}</div><h2>${esc(D.txt.repH2)}</h2>
+    ${fonte(D.txt.repFontes)}
+    <div class="tiles">${r.tiles.map((t,i) => `<div class="tile ${i===0?"preto":i===1?"ruim":""}"><div class="lbl">${esc(t[0])}</div><div class="n">${esc(t[1])}</div><p>${esc(t[2])}</p></div>`).join("")}</div>
+    <div class="rep-dupla"><div><div class="lbl">Onde falam e o tom · verde bom, cinza neutro, vermelho ruim</div>
+      ${r.canais.map(c => `<div class="canal"><div><b>${esc(c[0])}</b><span>${esc(c[1])}</span></div><div class="sent" role="img" aria-label="${c[2][0]}% bom, ${c[2][2]}% ruim"><i class="p" style="width:${c[2][0]}%"></i><i class="n" style="width:${c[2][1]}%"></i><i class="r" style="width:${c[2][2]}%"></i></div><span class="v">${c[2][2]}% ruim</span></div>`).join("")}
+      <p class="nums">${esc(r.semDado)}</p></div>
+      <div><div class="lbl">${esc(D.txt.temasLbl)}</div><div class="barras">${r.temas.map(t => barra(t[0], t[1], mxT, t[1]+"×", "ruim")).join("")}</div></div></div>
+    <div class="duas" style="margin-top:22px"><div><div class="lbl" style="margin-bottom:8px">Elogios que se repetem</div><div class="temas">${r.elogios.map(e => `<div class="queixa bom"><q>${esc(e[0])}</q><small>${esc(e[1])}</small></div>`).join("")}</div></div>
+      <div><div class="lbl" style="margin-bottom:8px">Críticas e reclamações</div><div class="temas">${r.queixas.map(e => `<div class="queixa ruim"><q>${esc(e[0])}</q><small>${esc(e[1])}</small></div>`).join("")}</div></div></div>
+    <div class="espacos" style="margin-top:22px">${r.leituras.map(l => `<div class="espaco"><span class="id">${esc(l[0])}</span><b>${esc(l[1])}</b><p>${esc(l[2])}</p></div>`).join("")}</div>`, true)}
+  ${painel("conc", `<div class="lbl">Reputação dos concorrentes</div><h2>O que a imprensa registrou</h2>${fonte(["Imprensa","Reclame Aqui dos concorrentes: não coletado"])}
+    <div class="tw"><table class="lista"><thead><tr><th>Quem</th><th>Onde</th><th>O que diz</th></tr></thead><tbody>${r.conc.map(c => `<tr><td>${esc(c[0])}</td><td>${esc(c[1])}</td><td>${esc(c[2])}</td></tr>`).join("")}</tbody></table></div>`)}
+  ${painel("nicho", `<div class="lbl">A falha do nicho</div><h2>Do que todo mundo reclama</h2>${fonte(["Reclame Aqui","Imprensa","Guia de carreira"])}
+    <div class="temas" style="margin-top:12px">${r.nicho.map(n => `<div class="queixa ruim"><div class="top"><b>${esc(n[0])}</b><span class="pill">${esc(n[1])}</span></div><q>${esc(n[2][0])}</q><small>${esc(n[2][1])}</small></div>`).join("")}</div>`)}
+</section>`; }],
+
+["youtube","YouTube · de graça", () => `<section class="folha">
+  <div class="bloco-pagos"><div class="lbl">YouTube em português</div><h2>${esc(D.txt.ytH2)}</h2>
+  <p>Coletado com yt-dlp em ${D.data}. <b>Busca é amostra, não o total da plataforma.</b></p></div>
+  ${fonte(D.txt.ytFontes)}
+  <div class="yt-kpis">${D.ytKpi.map((k,i) => `<div class="tile ${i===0?"preto":""}"><div class="lbl">${esc(k[0])}</div><div class="n">${esc(k[1])}</div></div>`).join("")}</div>
+  <div class="dupla2"><div><div class="lbl">Inscritos · ${C.ela} × concorrentes (mil)</div><div class="barras">${D.ytCanais.map(c => barra(c[0], c[1], Math.max(...D.ytCanais.map(x => x[1])), c[1].toLocaleString("pt-BR")+" mil", c[0].startsWith(C.curto)?"cli":"")).join("")}</div>${D.txt.ytFora ? `<p class="nums">${esc(D.txt.ytFora)}</p>` : ""}</div>
+    <div><div class="lbl">Os vídeos ${C.dela} que mais rodaram</div><div class="tw"><table class="lista"><tbody>${D.ytTop.map(y => `<tr><td>${esc(y[0])}<br><span class="nums" style="margin:0">${esc(y[1])} · ${esc(y[2])}</span></td><td class="num">${esc(y[3])}</td></tr>`).join("")}</tbody></table></div></div></div>
+  <h3>Quem ensina de graça</h3>
+  <div class="ferr"><input type="search" id="yt-q" placeholder="Filtrar por canal ou título" aria-label="Filtrar vídeos"></div>
+  <div class="tw"><table class="lista"><thead><tr><th>Vídeo</th><th>Canal</th><th>Views</th><th>Assunto</th></tr></thead><tbody id="yt-linhas">${D.ytGratis.map(y => `<tr><td>${esc(y[0])}</td><td>${esc(y[1])}</td><td class="num">${esc(y[2])}</td><td>${esc(y[3])}</td></tr>`).join("")}</tbody></table></div>
+  <p class="rodape">${esc(D.txt.ytLeitura)}</p>
+</section>`],
+
+["reels","Estudo de reels", () => { const P = D.perfisIG, mxM = Math.max(...P.map(p => p.mediana)); return `<section class="folha">
+  <div class="eyebrow"><span>Instagram · reels recentes · Apify em 26/10/2026</span><b>${P.reduce((s,p)=>s+p.reels,0)} reels de ${P.length} perfis</b></div>
+  <h1>Decode reels.</h1>
+  ${fonte(["Apify · instagram-reel-scraper","Até 40 reels por perfil, desde 26/04/2026"])}
+  <div class="tiles">
+    <div class="tile preto"><div class="lbl">Reels ${C.da} ${C.curto}</div><div class="n">${P[0].reels} <small>em ${P[0].dias} dias</small></div><p>${P[0].de.slice(8)}/${P[0].de.slice(5,7)} a ${P[0].ate.slice(8)}/${P[0].ate.slice(5,7)}</p></div>
+    <div class="tile"><div class="lbl">Mediana de views ${C.dela}</div><div class="n">${P[0].mediana.toLocaleString("pt-BR")}</div></div>
+    <div class="tile"><div class="lbl">Com palavra no comentário</div><div class="n">${P[0].com_palavra} <small>de ${P[0].reels}</small></div><p>${esc(P[0].palavras.join(", "))}</p></div>
+    <div class="tile custo"><div class="lbl">Custo da coleta</div><div class="n">${esc(D.txt.custoReels)}</div></div>
+  </div>
+  <div class="filtros" role="group" aria-label="Filtrar por perfil" id="f-perfil"><button type="button" data-v="" aria-pressed="true">Todos</button>${P.map(p => `<button type="button" data-v="${p.h}" aria-pressed="false">${esc(p.nome)}</button>`).join("")}<span class="sep"></span><button type="button" id="f-pal" aria-pressed="false">Só com palavra-chave</button></div>
+  <div class="dupla"><div><div class="lbl">Os mais vistos de cada perfil · toque pra abrir</div><div class="grade" id="grade">${D.reelsIG.map((r,i) => `<button type="button" class="cap" data-i="${i}" data-h="${r.h}" aria-current="${i===0}" style="background:#2a2620 ${r.capa ? `url('${r.capa}')` : ""} center/cover" aria-label="${esc(r.de)}, ${r.views.toLocaleString("pt-BR")} views"><span class="br">${(r.views/1000).toLocaleString("pt-BR",{maximumFractionDigits:0})} mil</span>${r.palavra?'<span class="isc"></span>':""}</button>`).join("")}</div>
+    <p class="nums">Bolinha laranja = pede palavra no comentário.</p></div>
+    <div><div class="lbl">Dentro do reel</div><div id="dentro"></div></div></div>
+  <div class="lbl" style="margin-top:24px">Mediana de views por reel</div>
+  <div class="barras">${P.map(p => barra(p.nome, p.mediana, mxM, p.mediana.toLocaleString("pt-BR"), p.h===P[0].h?"cli":"")).join("")}</div>
+  <div class="tw" style="margin-top:18px"><table class="lista"><thead><tr><th>Perfil</th><th>Reels</th><th>Período</th><th>Mediana</th><th>Maior</th><th>Coment. (mediana)</th><th>Palavra no comentário</th><th>Leva pro direct</th></tr></thead><tbody>
+  ${P.map((p,i) => `<tr class="${i===0?"cli":""}"><td>${esc(p.nome)}</td><td class="num">${p.reels}</td><td class="num">${p.de.slice(5).split("-").reverse().join("/")} a ${p.ate.slice(5).split("-").reverse().join("/")}</td><td class="num">${p.mediana.toLocaleString("pt-BR")}</td><td class="num">${p.maior.toLocaleString("pt-BR")}</td><td class="num">${p.coment_med}</td><td>${p.com_palavra} ${p.palavras.length ? "· "+esc(p.palavras.join(", ")) : ""}</td><td class="num">${p.com_direct}</td></tr>`).join("")}</tbody></table></div>
+  <div class="espacos" style="margin-top:22px">${D.leiturasReels.map(l => `<div class="espaco"><span class="id">Leitura nossa</span><b>${esc(l[0])}</b><p>${esc(l[1])}</p></div>`).join("")}</div>
+  <p class="rodape">${esc(D.txt.reelsRodape)}</p>
+</section>`; }],
+
+["anuncios","Estudo de ads", () => { const Q = D.quemAnuncia, A = D.anunciosConc, mx = Math.max(1, ...Q.map(q => q.total));
+  const ficha = f => f ? `<dl class="info" style="margin-top:4px"><dt>Gancho</dt><dd>${esc(f.gancho)}</dd><dt>Promessa</dt><dd>${esc(f.promessa)}</dd><dt>Oferta</dt><dd>${esc(f.oferta)}</dd><dt>CTA</dt><dd>${esc(f.cta)}</dd><dt>Consciência</dt><dd>${esc(f.consc)}</dd><dt>Etapa</dt><dd>${esc(f.etapa)}</dd><dt>Lançamento</dt><dd>${f.lanc ? "Sim" : "Não"}</dd></dl>` : "";
+  const card = a => { const f = D.fichasAds[a.id]; return `<div class="anuncio ${a.de===C.curto?"cli":""}"><div class="img" style="background:#2a2620 ${a.img ? `url('${a.img}')` : ""} center/cover"></div>
+    <div class="corpo"><div class="quem">${esc(a.de)}</div><div class="dias">${a.dias} <small>dias no ar · ${a.inicio.split("-").reverse().join("/")}${a.fim ? " a " + a.fim.split("-").reverse().join("/") : " · ativo"}</small></div>
+    <div class="meta"><span class="pill ${a.dias>30?"ok":"inc"}">${a.dias>30?"Vencedor":"Teste curto"}</span><span class="pill">${a.versoes} versões</span>${a.formatos.map(x => `<span class="pill">${esc(x)}</span>`).join("")}</div>
+    <div class="txt">${esc(a.texto.slice(0,320))}${a.texto.length>320?"…":""}</div><div class="nums" style="margin:0">→ ${esc(a.destinos.join(" · ") || "sem link")}</div>${ficha(f)}</div></div>`; };
+  return `<section class="folha">
+  ${subs("anun", [["quem","Quem anuncia"],["anuncios","Anúncios e fichas"],["padroes","Padrões"],["historico","Histórico"], ...(D.ads && D.ads.length ? [["outros",`De outros com o nome ${C.dela}`]] : [])])}
+  ${painel("quem", `<div class="lbl">Biblioteca de Anúncios da Meta · Brasil · coleta Apify ${D.adsColeta}</div><h2>Quem anuncia, quanto e há quanto tempo</h2>
+    ${fonte(["Apify · meta-ad-library-scraper","Busca por site e por nome"])}
+    <p class="nums">Mais de 30 dias no ar = provável vencedor. A biblioteca não mostra gasto. Busca por nome traz anúncio de outros: só entra página com o nome exato.</p>
+    <div class="barras">${Q.map(q => `<div class="barra ${q.cli?"cli":""}"><span class="n">${esc(q.nome)}</span><div class="t" role="img" aria-label="${q.ativos} ativos de ${q.total}"><i class="claro" style="width:${q.total/mx*100}%"></i><i style="width:${q.ativos/mx*100}%"></i></div><span class="v">${q.ativos}/${q.total}</span></div>`).join("")}</div>
+    <p class="nums" style="margin-top:8px">Escuro = ativos hoje · claro = total no histórico da coleta</p>
+    <div class="tw"><table class="lista"><thead><tr><th>Quem</th><th>No histórico</th><th>Ativos</th><th>+30 dias</th><th>Mais longo</th><th>Copys diferentes</th><th>Formatos</th><th>Pra onde leva</th></tr></thead><tbody>
+    ${Q.map(q => `<tr class="${q.cli?"cli":""}"><td>${esc(q.nome)}</td><td class="num">${q.total}</td><td class="num">${q.ativos}</td><td class="num">${q.venc}</td><td class="num">${q.longo ? q.longo+" dias" : "—"}</td><td class="num">${q.copys || "—"}</td><td>${esc(q.formatos)}</td><td>${esc(q.destinos)}</td></tr>`).join("")}</tbody></table></div>`, true)}
+  ${painel("anuncios", `<div class="lbl">Um cartão por copy · a versão que ficou mais tempo no ar</div><h2>Os anúncios e a ficha de cada um</h2>
+    ${fonte(["Biblioteca de Anúncios da Meta","Ficha: leitura do Claude sobre o texto, sem transcrever o vídeo"])}
+    ${[...new Set(A.map(a => a.de))].map(de => `<div class="grupo-tema">${de===C.curto?C.nome:de} <span>${A.filter(a=>a.de===de).length} copys · ${A.filter(a=>a.de===de).reduce((s,a)=>s+a.versoes,0)} anúncios</span></div><div class="anuncios-grade">${A.filter(a => a.de===de).map(card).join("")}</div>`).join("")}
+    <p class="rodape">${esc(D.adsSemAnuncio)}</p>`)}
+  ${painel("padroes", `<div class="lbl">Bases do espião · A copy parecida · B duplicados · C mais antigos</div><h2>Padrões</h2>${fonte(["Script resumo_anuncios.py"])}
+    <div class="espacos">${D.padroesConc.map(p => `<div class="espaco"><span class="id">${esc(p[0])}</span><b>${esc(p[1])}</b><p>${esc(p[2])}</p></div>`).join("")}</div>`)}
+  ${painel("historico", `<div class="lbl">Quando cada campanha começou · anúncios por mês de início</div><h2>Histórico de campanhas ${esc(D.txt.histDe)}</h2>${fonte(["Biblioteca de Anúncios da Meta (status: todos)"])}
+    <div class="barras">${D.histAds.map(h => barra(h[0]+" · "+h[2], h[1], Math.max(...D.histAds.map(x=>x[1])), h[1]+" anúncios")).join("")}</div>
+    <p class="nums" style="margin-top:10px">${esc(D.histObs)}</p>`)}
+  ${D.ads && D.ads.length ? painel("outros", `<div class="lbl">Eventos de terceiros que usam o nome ${C.dela} · ativos em 24/10</div><h2>De outros com o nome ${C.dela}</h2>${fonte(["Biblioteca de Anúncios da Meta (busca por nome, 24/10)"])}
+    <div class="anuncios-grade">${D.ads.filter(a => a.de !== C.nome).map(a => `<div class="anuncio"><div class="img" style="background:linear-gradient(160deg,#2d3d5b,#16140F)">${esc(a.img)}</div>
+      <div class="corpo"><div class="quem">${esc(a.de)}</div><div class="dias">${a.dias} <small>dias no ar · desde ${esc(a.ini)}</small></div><div class="meta"><span class="pill">${a.n} versões</span><span class="pill">${esc(a.formato)}</span></div>
+      <div class="txt">${esc(a.txt)}</div><div class="nums" style="margin:0">→ ${esc(a.destino)}</div></div></div>`).join("")}</div>`) : ""}
+</section>`; }],
+
+["lancamentos","Lançamentos", () => `<section class="folha">
+  <div class="lbl">${esc(D.txt.agendaLbl)}</div><h2>Eventos e lançamentos</h2>
+  ${fonte(D.txt.fontesLanc)}
+  <div class="tw"><table class="lista"><thead><tr><th>Evento</th><th>Data</th><th>Tipo</th><th>Preço</th></tr></thead><tbody>
+  ${D.passado.map(e => `<tr><td>${esc(e[0])} <span class="pill">já passou</span></td><td class="num">${esc(e[1])}</td><td>${esc(e[2])}</td><td>${esc(e[3])}</td></tr>`).join("")}
+  ${D.agenda.map(e => `<tr class="${e[2]==="Próprio"?"cli":""}"><td>${esc(e[0])}</td><td class="num">${esc(e[1])}</td><td>${esc(e[2])}</td><td>${esc(e[3])}</td></tr>`).join("")}</tbody></table></div>
+  <p class="nums">Em verde, eventos ${C.dela}.</p><h3>Concorrentes</h3><div class="tw"><table class="lista"><thead><tr><th>Quem</th><th>Evento</th><th>Data</th><th>Preço</th></tr></thead><tbody>${D.lancConc.map(e => `<tr><td>${esc(e[0])}</td><td>${esc(e[1])}</td><td class="num">${esc(e[2])}</td><td>${esc(e[3])}</td></tr>`).join("")}</tbody></table></div>
+  <h3>Black Friday</h3>
+  <div class="tw"><table class="lista"><thead><tr><th>Quem</th><th>O que se viu</th></tr></thead><tbody>${D.bf.map(b => `<tr class="${b[0].startsWith(C.curto)?"cli":""}"><td>${esc(b[0])}</td><td>${esc(b[1])}</td></tr>`).join("")}</tbody></table></div>
+</section>`],
+
+["busca","Busca e IA", () => `<section class="folha">
+  <div class="lbl">Visibilidade</div><h2>Quem aparece na busca</h2>
+  ${fonte(["Busca web","YouTube"])}
+  <div class="tw"><table class="lista"><thead><tr><th>Busca</th><th>Primeiros resultados</th><th>${esc(C.curto)}</th></tr></thead><tbody>${D.busca.map(b => `<tr><td>"${esc(b[0])}"</td><td>${esc(b[1])}</td><td><span class="pill ${b[2]==="Não aparece"?"inc":"meio"}">${esc(b[2])}</span></td></tr>`).join("")}</tbody></table></div>
+  <p class="nums">${esc(D.buscaObs)}</p>
+  ${D.buscaYt ? `<h3>No YouTube é outra história</h3><div class="barras">${barra(...D.buscaYt, "cli")}</div>` : ""}
+</section>`],
+
+["publico","Público", () => `<section class="folha">
+  <div class="lbl">Como o público fala e decide</div><h2>O público</h2>
+  ${fonte(D.txt.fontesPublico)}
+  <div class="persona"><small>Persona · leitura nossa</small>${esc(D.persona.texto)}<dl>${D.persona.campos.map(c => `<dt>${esc(c[0])}</dt><dd>${esc(c[1])}</dd>`).join("")}</dl></div>
+  <h3>Voz do público</h3>
+  <div class="duas">${D.voz.map(v => `<blockquote class="cit">${esc(v[0])}<small>${esc(v[1])}</small></blockquote>`).join("")}</div>
+  <h3>A dor nas palavras ${C.dela}</h3>
+  <div class="duas">${D.dorCopy.map(d => `<div class="cartao"><span class="lbl">${esc(d[0])}</span><p>${esc(d[1])}</p></div>`).join("")}</div>
+  <h3>Como decide</h3>
+  <div class="duas">${D.decisao.map(d => `<div class="cartao"><span class="lbl">${esc(d[0])}</span><p>${esc(d[1])}</p></div>`).join("")}</div>
+  <h3>Léxico</h3>
+  <div class="duas"><div><div class="lbl" style="margin-bottom:8px">Palavras que atraem</div><div class="lex">${D.atrai.map(w => `<span>${esc(w)}</span>`).join("")}</div></div>
+    <div><div class="lbl" style="margin-bottom:8px">Palavras que afastam</div><div class="lex ruim">${D.repele.map(w => `<span>${esc(w)}</span>`).join("")}</div></div></div>
+  <h3>Objeções que aparecem</h3>
+  <div class="tw"><table class="lista"><thead><tr><th>Objeção</th><th>Onde aparece</th></tr></thead><tbody>${D.objecoes.map(o => `<tr><td>${esc(o[0])}</td><td>${esc(o[1])}</td></tr>`).join("")}</tbody></table></div>
+</section>`],
+
+["posicionamento","Posicionamento", () => { const cm = D.camadas; return `<section class="folha">
+  ${subs("pos", [["eixos","Os 7 eixos"],["gap","GAP"],["hoje","Como se posiciona hoje"],["valor","Mapa de valor"],["causa","Sintoma × causa"],["validar","O que falta"]])}
+  ${painel("eixos", `<div class="lbl">Posicionamento</div><h2>Os 7 eixos, em três camadas</h2>${fonte([`Páginas ${C.dela}`,"Comentários","Concorrentes"])}
+    <p class="nums"><b>FATO</b> tem fonte nas outras abas · <b>INFERÊNCIA</b> é leitura nossa.</p>
+    <div class="eixos">${D.eixos.map(e => `<div class="eixo"><div><h4>${esc(e[0])}<span class="fato ${e[3]==="INFERÊNCIA"?"inf":""}">${e[3]}</span></h4><p class="o">${esc(e[1])}</p>
+      <div class="camadas3"><div><span class="lbl">O óbvio</span>${esc(e[2][0])}</div><div><span class="lbl">O que está atrás</span>${esc(e[2][1])}</div><div><span class="lbl">O que ninguém fala</span>${esc(e[2][2])}</div></div></div></div>`).join("")}</div>`, true)}
+  ${painel("gap", `<div class="lbl">Onde todo mundo briga e onde só ${C.ela} está</div><h2>GAP do mercado</h2>${fonte(["Concorrentes","Produtos"])}
+    <div class="duas"><div class="cartao"><span class="lbl">O que todo mundo faz igual</span>${D.igual.map(t => `<p>· ${esc(t)}</p>`).join("")}</div>
+      <div class="cartao lar"><span class="lbl" style="color:var(--laranja)">O que só ${C.ela} entrega</span>${D.ninguem.map(t => `<p>· ${esc(t)}</p>`).join("")}</div></div>
+    <div class="mec"><span class="lbl">Onde o mercado não está olhando</span><b>${esc(D.naoOlhaTitulo)}</b><p>${esc(D.naoOlha)}</p></div>
+    <h3>As camadas: quem tem cada uma</h3>
+    <div class="tw"><table class="lista"><thead><tr><th>Camada</th>${cm.cols.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>
+    ${cm.linhas.map(l => `<tr><td>${esc(l[0])}</td>${l[1].map(v => `<td><span class="bol ${v}"></span></td>`).join("")}</tr>`).join("")}</tbody></table></div>
+    <p class="nums">Verde tem · amarelo tem em parte · cinza não encontrado (não quer dizer que não tem).</p>`)}
+  ${painel("hoje", `<div class="lbl">O que ${C.ela} diz de si hoje</div><h2>Como se posiciona hoje</h2>${fonte(["Bio do Instagram","Páginas de venda"])}
+    <div class="frase"><small>Posicionamento declarado</small>${esc(D.hoje.frase)}</div>
+    <div class="tw" style="margin-top:12px"><table class="lista"><thead><tr><th>Produto</th><th>Promessa na página</th></tr></thead><tbody>${D.hoje.promessas.map(p => `<tr><td>${esc(p[0])}</td><td>${esc(p[1])}</td></tr>`).join("")}</tbody></table></div>
+    ${declaradoHtml()}`)}
+  ${painel("valor", `<div class="lbl">Dores e ganhos × o que ${C.ela} vende</div><h2>Mapa de valor</h2>${fonte(["Produtos","Público"])}
+    <div class="tw"><table class="lista"><thead><tr><th>Dor ou ganho</th><th>Tipo</th><th>O que na oferta resolve</th></tr></thead><tbody>${D.valor.map(v => `<tr><td>${esc(v[0])}</td><td><span class="pill">${esc(v[1])}</span></td><td>${esc(v[2])}</td></tr>`).join("")}</tbody></table></div>
+    <h3>A oferta de hoje cobre o que importa?</h3>
+    <div class="tw"><table class="lista"><thead><tr><th>O que o público precisa</th><th>Cobertura</th><th>Por quê</th></tr></thead><tbody>${D.fit.map(f => `<tr><td>${esc(f[0])}</td><td><span class="bol ${f[1]==="verde"?"sim":f[1]==="amarelo"?"meio":"nao"}">${f[1]==="verde"?"Cobre":f[1]==="amarelo"?"Em parte":"Não cobre"}</span></td><td>${esc(f[2])}</td></tr>`).join("")}</tbody></table></div>`)}
+  ${painel("causa", `<div class="lbl">Do sintoma ao mecanismo</div><h2>Sintoma × causa</h2>${fonte([`Páginas ${C.dela}`,"Comentários"])}
+    <div class="tw"><table class="lista"><thead><tr><th>Sintoma</th><th>Causa</th><th>Quem</th><th>Sangramento</th><th>Consciência</th></tr></thead><tbody>${D.sintomas.map(s => `<tr><td>${esc(s[0])}</td><td>${esc(s[1])}</td><td>${esc(s[2])}</td><td><span class="pill ${s[3]==="Alto"?"inc":"meio"}">${esc(s[3])}</span></td><td>${esc(s[4])}</td></tr>`).join("")}</tbody></table></div>
+    <h3>As causas-raiz</h3><div class="duas">${D.causas.map(c => `<div class="cartao"><span class="lbl">${esc(c[0])}</span><p>${esc(c[1])}</p></div>`).join("")}</div>
+    <div class="mec"><span class="lbl">O mecanismo que ${C.ela} usa</span><b>${esc(D.mecanismo[0])}</b><p>${esc(D.mecanismo[1])}</p></div>`)}
+  ${painel("validar", `<div class="lbl">Antes de concluir</div><h2>O que falta coletar</h2>${fonte(["Esta coleta"])}
+    <div class="cartao lar"><span class="lbl">O que este painel não sabe</span>${D.limites ? limitesHtml() : `<p style="margin:0;font-size:14px">${esc(D.errado)}</p>`}</div>
+    <div class="duas" style="margin-top:18px"><div><div class="lbl">Coletar</div><ul class="check">${D.validar.map(v => `<li>${esc(v)}</li>`).join("")}</ul></div>
+      <div><div class="lbl">Decidir</div><ul class="check">${D.proximos.map(v => `<li>${esc(v)}</li>`).join("")}</ul></div></div>`)}
+</section>`; }],
+
+["funil","Funil de conteúdo", () => funilAba("conteudo")],
+["venda","Funil de venda", () => funilAba("venda")],
+...(D.fontes ? [["fontes","Fontes", () => fontesAba()]] : []),
+["nomes","Nomes e marcas", () => nomesAba()]
+];
+
+/* ===================== estudo (selo de confiança, veredito, limites, preço por formato, fontes) =====================
+   Tudo opcional: sem D.confianca, D.limites, D.fontes ou D.precosFormato
+   a aba mostra o que mostrava antes. Selo: alta · moderada · baixa. Veredito: Confirmada · Em parte · Divergente · Sem lastro. */
+const selo = c => c ? `<span class="selo-c ${esc(c)}">confiança ${esc(c)}</span>` : "";
+const lnk = (u, t) => u ? `<a class="lnk" href="${esc(u)}" target="_blank" rel="noopener">${esc(t || u.replace(/^https?:\/\/(www\.)?/, "").split("/")[0])} ↗</a>` : "";
+const geralHtml = () => D.confianca ? `<div class="geral">${selo(D.confianca[0])}<p>${esc(D.confianca[1])}</p><span class="nums" style="margin:0">${D.fontes ? `<b>${D.fontes.length}</b> fontes · ` : ""}<b>${K.length}</b> concorrentes · coletado em ${esc(D.data)}</span></div>` : "";
+const achadosHtml = () => `<div class="lbl" style="margin-bottom:8px">${D.achados.length} achados · leitura nossa sobre os dados${D.achados.some(x => x[2]) ? " · o selo diz o quanto cada um é firme" : ""}</div>
+  <div class="achados">${D.achados.map(x => `<div class="achado"><div>${selo(x[2])}<b>${esc(x[0])}</b><p>${esc(x[1])}</p></div></div>`).join("")}</div>`;
+const limitesHtml = () => D.limites ? `<ul class="limites">${D.limites.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : `<div class="brecha">${esc(D.errado)}</div>`;
+const VD = {"Confirmada":"confirmada", "Em parte":"parte", "Divergente":"divergente", "Sem lastro":"semlastro"};
+const declaradoHtml = () => D.declarado.some(d => d[2]) ? `<h3>O que diz × o que se vê · conferido</h3>
+  <p class="nums"><span class="vd confirmada">Confirmada</span> a fonte bate · <span class="vd parte">Em parte</span> só uma parte bate · <span class="vd divergente">Divergente</span> a fonte contradiz · <span class="vd semlastro">Sem lastro</span> nenhuma fonte achada confirma</p>
+  <div class="tw"><table class="lista"><thead><tr><th>Diz</th><th>Veredito</th><th>O que se vê</th><th>Fonte</th></tr></thead><tbody>${D.declarado.map(d => `<tr><td>${esc(d[0])}</td><td><span class="vd ${VD[d[2]] || ""}">${esc(d[2] || "—")}</span></td><td>${esc(d[1])}</td><td>${lnk(d[3])}</td></tr>`).join("")}</tbody></table></div>`
+  : `<h3>O que diz × o que se vê</h3>
+  <div class="tw"><table class="lista"><thead><tr><th>Diz</th><th>O que se vê</th></tr></thead><tbody>${D.declarado.map(d => `<tr><td>${esc(d[0])}</td><td>${esc(d[1])}</td></tr>`).join("")}</tbody></table></div>`;
+const mediana = a => { const s = [...a].sort((x,y) => x-y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m-1]+s[m])/2; };
+// D.precosFormato: [formato, quem, produto, preço ou null, link]. Ponto verde = quem tem o nome de C.nome.
+const formatosHtml = () => {
+  const P = D.precosFormato; if (!P) return "";
+  const fm = [...new Set(P.map(p => p[0]))], com = P.filter(p => p[3]), eCli = p => p[1] === C.nome;
+  let graf = `<p class="nums">Nenhum preço publicado nos formatos levantados.</p>`;
+  if (com.length) {
+    const lo = Math.log10(Math.min(...com.map(p => p[3])) / 1.5), hi = Math.log10(Math.max(...com.map(p => p[3])) * 1.5);
+    const W = 560, m = 16, lh = 54, H = fm.length*lh + 30, x = v => m + (Math.log10(v)-lo)/(hi-lo)*(W-2*m);
+    const tks = [10,20,50,100,200,500,1000,2000,5000,10000,20000,50000].filter(v => Math.log10(v) > lo && Math.log10(v) < hi);
+    graf = `<svg class="grafico" viewBox="0 0 ${W} ${H}" role="img" aria-label="Preços publicados por formato, em escala logarítmica">
+      ${tks.map(v => `<line x1="${x(v)}" y1="6" x2="${x(v)}" y2="${H-24}" stroke="#DED8C8" stroke-dasharray="2 3"/><text class="tk" x="${x(v)}" y="${H-8}" text-anchor="middle">R$ ${v >= 1000 ? v/1000 + " mil" : v}</text>`).join("")}
+      ${fm.map((f,i) => { const y = i*lh + 38, ps = P.filter(p => p[0] === f), vs = ps.filter(p => p[3]).map(p => p[3]), sem = ps.length - vs.length;
+        return `<text class="nm" x="${m}" y="${y-16}">${esc(f)} · ${vs.length ? `${vs.length} com preço · mediana ${brl(mediana(vs))}` : "nenhum preço publicado"}${sem ? ` · ${sem} sem preço` : ""}</text><line class="linhaP" x1="${m}" y1="${y}" x2="${W-m}" y2="${y}"/>
+        ${ps.filter(p => p[3]).map(p => `<circle class="bola ${eCli(p)?"cli":""}" cx="${x(p[3])}" cy="${y}" r="${eCli(p)?8:6}"><title>${esc(p[1])} · ${esc(p[2])} · ${brl(p[3])}</title></circle>`).join("")}`; }).join("")}
+    </svg>`;
+  }
+  const tab = `<div class="tw"><table class="lista"><thead><tr><th>Formato</th><th>Quem</th><th>Produto</th><th>Preço</th><th>Página</th></tr></thead><tbody>${P.map(p => `<tr class="${eCli(p)?"cli":""}"><td>${esc(p[0])}</td><td>${esc(p[1])}</td><td>${esc(p[2])}</td><td class="num">${p[3] ? brl(p[3]) : "não publicado"}</td><td>${lnk(p[4])}</td></tr>`).join("")}</tbody></table></div>`;
+  return `<div class="fmt-topo"><div class="lbl">Preço por formato · ${esc(C.nome)} e concorrentes</div><button type="button" class="pill fmt-ver" aria-pressed="false" style="cursor:pointer;font-size:11px;padding:5px 9px">Ver em tabela</button></div>
+    <div class="fmt-graf">${graf}<p class="nums">Escala logarítmica. Verde é ${esc(C.nome)}; vermelho, concorrentes. Passe o mouse num ponto pra ver quem é, ou abra a tabela. Só entra preço visto na página ou no checkout; a mediana é calculada no painel.</p></div>
+    <div class="fmt-tab" hidden>${tab}</div>`;
+};
+// D.fontes: [tipo, nome, link, onde foi usada, data de acesso (vazio = D.data)].
+const TIPOS_FONTE = [["especialista","Do próprio especialista","Mostra o que a pessoa diz de si. Não prova que é verdade."],["concorrente","De concorrente","Mostra o que o concorrente diz e cobra."],
+  ["checkout","Checkout e marketplace","Preço e condição na hora da compra."],["registro","Registro público","Conselho profissional, marca, domínio."],
+  ["imprensa","Imprensa","Terceiro que publicou. Pode ter erro ou estar velho."],["reclamacao","Reclamação de cliente","Relato de quem comprou, sem verificação caso a caso."],
+  ["rede","Rede social","Post, vídeo ou comentário."],["coleta","Coleta por script","Ferramenta que puxa e conta. A conta é do script, não da IA."]];
+function fontesAba(){
+  const F = D.fontes || [], gs = TIPOS_FONTE.filter(t => F.some(f => f[0] === t[0]));
+  return `<section class="folha"><div class="lbl">De onde veio cada coisa</div><h2>${F.length} fontes, separadas pelo peso de cada uma</h2>
+  <p class="nums">Acesso em ${esc(D.data)} quando a linha não diz outra data. A página do próprio vendedor mostra o que ele afirma; o lastro vem de registro público, checkout e terceiros.</p>
+  <div class="fontes-tipos">${gs.map(t => `<div class="cartao"><span class="lbl">${esc(t[1])}</span><b>${F.filter(f => f[0] === t[0]).length}</b></div>`).join("")}</div>
+  ${gs.map(t => `<h3>${esc(t[1])}</h3><p class="nums">${esc(t[2])}</p><div class="tw"><table class="lista"><thead><tr><th>Fonte</th><th>Usada em</th><th>Acesso</th></tr></thead><tbody>${F.filter(f => f[0] === t[0]).map(f => `<tr><td>${f[2] ? lnk(f[2], f[1]) : esc(f[1])}</td><td>${esc(f[3])}</td><td class="num">${esc(f[4] || D.data)}</td></tr>`).join("")}</tbody></table></div>`).join("")}
+</section>`;
+}
+/* ===================== fim estudo ===================== */
+
+/* ===================== fim configurar ===================== */
+
+/* ===================== nomes e marcas (INPI + Registro.br + buscadores) ===================== */
+const NICE = ["","químicos","tintas","cosméticos e limpeza","óleos e combustíveis","farmacêuticos e suplementos","metais","máquinas","ferramentas","aparelhos e software","aparelhos médicos","iluminação","veículos","armas","joias","instrumentos musicais","papel e impressos","borracha e plástico","couro e bolsas","materiais de construção","móveis","utensílios domésticos","cordas e lonas","fios","tecidos","vestuário e calçados","aviamentos","tapetes","jogos e esporte","carnes e laticínios","café, doces e farinhas","produtos agrícolas","bebidas sem álcool","bebidas alcoólicas","tabaco","publicidade e gestão de negócios","seguros e finanças","construção e reparos","telecomunicações","transporte","tratamento de materiais","educação, eventos e entretenimento","tecnologia e software","alimentação e hospedagem","serviços médicos e estética","serviços jurídicos e pessoais"];
+const classeTxt = c => { const n = +(String(c).match(/(\d+)\s*$/) || String(c).match(/(\d+)/) || [])[1]; return n && NICE[n] ? `${n} · ${NICE[n]}` : c; };
+const GRUPOS_NOME = [["mesmo","Mesmo setor ou público"],["outro","Outros setores"],["exterior","Exterior"]];
+function nomesAba(){
+  const N = D.nomes || {marcas: []}, M = N.marcas;
+  const dom = d => d.registrado ? `<span class="pill inc">ocupado</span> ${d.criado ? "desde " + d.criado.split("-").reverse().join("/") : ""}` : d.registrado === false ? `<span class="pill ok">livre</span>` : `<span class="pill">não consultado</span>`;
+  const marca = m => { const P = m.inpi.processos || [], at = P.filter(p => p.ativo), O = m.ocorrencias || [];
+    const classes = [...new Set(at.map(p => classeTxt(p.classe)))];
+    return `<div class="tiles">
+      <div class="tile preto"><div class="lbl">INPI · nome exato</div><div class="n">${m.inpi.total ?? "?"} <small>processos</small></div><p>${at.length} em vigor ou em análise</p></div>
+      <div class="tile ${at.length ? "ruim" : ""}"><div class="lbl">Classes ocupadas</div><div class="n">${classes.length}</div><p>${esc(classes.slice(0,3).join(" · ") || "nenhuma")}</p></div>
+      <div class="tile"><div class="lbl">Domínios ocupados</div><div class="n">${m.dominios.filter(d => d.registrado).length} <small>de ${m.dominios.length}</small></div><p>${esc(m.dominios.map(d => d.dominio).join(" · "))}</p></div>
+      <div class="tile"><div class="lbl">Ocorrências mapeadas</div><div class="n">${O.length}</div><p>${GRUPOS_NOME.map(g => O.filter(o => o[2] === g[0]).length + " " + g[1].split(" ")[0].toLowerCase()).join(" · ")}</p></div></div>
+    ${m.leitura ? `<div class="lbl">Visão executiva</div><h2>${esc(m.leitura[0])}</h2><p>${esc(m.leitura[1])}</p>` : ""}
+    ${GRUPOS_NOME.filter(g => O.some(o => o[2] === g[0])).map(g => `<h3>${g[1]}</h3><div class="conc-grade">${O.filter(o => o[2] === g[0]).map(o => `<div class="tile"><b>${esc(o[0])}</b><p>${esc(o[1])}</p>${o[3] ? `<a class="link" href="${esc(o[3])}" target="_blank" rel="noopener">Fonte ↗</a>` : ""}</div>`).join("")}</div>`).join("")}
+    <h3>INPI · processos com o nome exato</h3>
+    ${P.length ? `<div class="tw"><table class="lista"><thead><tr><th>Processo</th><th>Depósito</th><th>Titular</th><th>Classe</th><th>Situação</th></tr></thead><tbody>${P.map(p => `<tr><td class="num"><a class="link" href="https://busca.inpi.gov.br/pePI/" target="_blank" rel="noopener">${esc(p.numero)}</a></td><td class="num">${esc(p.data)}</td><td>${esc(p.titular)}</td><td>${esc(classeTxt(p.classe))}</td><td><span class="pill ${p.ativo ? "inc" : ""}">${esc(p.situacao)}</span></td></tr>`).join("")}</tbody></table></div>`
+      : `<p class="nums">${m.inpi.erro ? "O INPI não respondeu: " + esc(m.inpi.erro) : "Nenhum processo com o nome exato."}</p>`}
+    <h3>Domínios</h3><div class="tw"><table class="lista"><thead><tr><th>Domínio</th><th>Situação</th><th>Vence</th></tr></thead><tbody>${m.dominios.map(d => `<tr><td>${esc(d.dominio)}</td><td>${dom(d)}</td><td class="num">${d.vence ? d.vence.split("-").reverse().join("/") : "—"}</td></tr>`).join("")}</tbody></table></div>
+    ${m.examinar && m.examinar.length ? `<div class="lbl" style="margin-top:22px">Decisão</div><h2>${m.examinar.length} ocorrências pra examinar primeiro</h2><div class="achados">${m.examinar.map(x => `<div class="achado"><div><b>${esc(x[0])}</b><p>${esc(x[1])}</p></div></div>`).join("")}</div>` : ""}`; };
+  const form = "";
+  const limites = `<div class="lbl">Registro e limites</div><h2>Presença pública não é parecer de disponibilidade</h2>
+    <p>A busca mostra quem já usa o nome e o que está no INPI com a grafia exata. Não comprova disponibilidade jurídica, anterioridade de uso nem ausência de registro: grafias parecidas, marcas figurativas e registros em outros países ficam de fora. O INPI usa a Classificação de Nice (45 classes); a decisão de registro é de um advogado de marcas, olhando as classes da oferta.</p>
+    <p class="nums">O titular de domínio .com.br não aparece (o Registro.br esconde pela LGPD). Os textos das empresas descrevem as próprias ofertas e não foram auditados.</p>`;
+  return `<section class="folha">
+    <div class="lbl">Nomes e marcas${N.data ? " · pesquisa de " + esc(N.data) : ""}</div><h2>${M.length ? `${M.length} ${M.length > 1 ? "nomes analisados" : "nome analisado"}: onde o nome já tem dono` : "Nenhum nome analisado ainda"}</h2>
+    ${fonte(["INPI · pePI","Registro.br · RDAP","Verisign · RDAP (.com)","Buscadores e diretórios de CNPJ"])}
+    ${subs("nomes", [...M.map((m,i) => ["m"+i, m.nome]), ["limites","Limites"]])}
+    ${M.map((m,i) => painel("m"+i, marca(m), i === 0)).join("")}
+    ${painel("novo", form, !M.length)}${painel("limites", limites)}
+  </section>`;
+}
+/* ===================== fim nomes e marcas ===================== */
+
+function funilAba(tipo){
+  const L = tipo === "conteudo" ? D.fConteudo : D.fVenda;
+  const cols = tipo === "conteudo" ? [["Hub de links","hub"],["Isca grátis","isca"],["Guarda o contato","captura"],["YouTube","yt"],["Canal extra","extra"]]
+    : [["Anúncio leva pra","destino"],["Página","pagina"],["Preço","preco"],["Checkout","checkout"],["Garantia","garantia"],["Recupera carrinho","recup"]];
+  const tom = v => /^(Não|Escondido|—)/.test(v) ? "inc" : /^Não testado/.test(v) ? "" : "ok";
+  const nome = f => f.nome || nomeDe(f.id);
+  const desenho = f => `<div class="fluxo">${f.passos.map(p => `<div class="no ${p[2]==="vaza"?"alerta":""}"><div class="f">${p[2]==="vaza"?"vaza aqui":"passo"}</div><b>${esc(p[0])}</b><span>${esc(p[1])}</span></div>`).join("")}</div>`;
+  const dela = L.filter(f => f.id.startsWith("cli")), outros = L.filter(f => !f.id.startsWith("cli"));
+  return `<section class="folha">
+  <div class="bloco-pagos"><div class="lbl">${tipo==="conteudo" ? "Funil de conteúdo · como o conteúdo vira contato hoje" : "Funil de venda · como o contato vira venda hoje"}</div>
+  <h2>${tipo==="conteudo" ? "Do post ao contato guardado" : "Do anúncio ao pagamento"}</h2>
+  <p>Desenhado de fora, pelo que dá pra ver: ${tipo==="conteudo" ? "link na bio, páginas e capturas" : "destino dos anúncios, páginas e checkouts"}, em ${D.data}. <b>Em vermelho, onde perde gente.</b> Comentário de teste e carrinho abandonado: não feitos (precisam de autorização).</p></div>
+  ${fonte(tipo==="conteudo" ? D.txt.fontesFunil : ["Biblioteca de Anúncios da Meta","Páginas e checkouts"])}
+  ${subs("f"+tipo, [["cli",`${C.Da} ${C.curto}`],["conc","Dos concorrentes"],["lado","Lado a lado"]])}
+  ${painel("cli", dela.map(f => `<h3>${esc(nome(f))}</h3>${desenho(f)}<div class="brecha" style="margin-top:6px"><div class="lbl">Onde vaza · leitura nossa</div>${esc(f.obs)}</div>`).join(""), true)}
+  ${painel("conc", outros.map(f => `<h3>${esc(nome(f))}</h3>${desenho(f)}<p class="nums" style="margin-top:0">${esc(f.obs)}</p>`).join(""))}
+  ${painel("lado", `<div class="lbl">Cada etapa, quem tem</div><h2>Lado a lado</h2><div class="tw"><table class="lista"><thead><tr><th>Quem</th>${cols.map(c => `<th>${c[0]}</th>`).join("")}</tr></thead><tbody>
+    ${L.map(f => `<tr class="${f.id.startsWith("cli")?"cli":""}"><td>${esc(nome(f))}</td>${cols.map(c => `<td><span class="pill ${tom(f.cols[c[1]])}">${esc(f.cols[c[1]])}</span></td>`).join("")}</tr>`).join("")}</tbody></table></div>`)}
+</section>`;
+}
+
+/* ===================== navegação ===================== */
+const tabs = $("#tabs"), vista = $("#vista");
+tabs.innerHTML = ABAS.map(([id,t]) => `<button type="button" role="tab" id="t-${id}" data-id="${id}" aria-selected="false">${t}</button>`).join("");
+function abrir(id){
+  const a = ABAS.find(x => x[0] === id) || ABAS[0];
+  tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.id === a[0]));
+  vista.innerHTML = a[2]();
+  vista.setAttribute("role","tabpanel"); vista.setAttribute("aria-labelledby","t-"+a[0]);
+  if (a[0] === "reels") reels();
+  try { history.replaceState(null, "", "#" + a[0]); } catch(e) {}
+}
+tabs.addEventListener("click", e => { const b = e.target.closest("button"); if (b) abrir(b.dataset.id); });
+vista.addEventListener("click", e => {
+  const fv = e.target.closest(".fmt-ver"); if (fv) { const t = vista.querySelector(".fmt-tab"), g = vista.querySelector(".fmt-graf"), tab = t.hidden; t.hidden = !tab; g.hidden = tab; fv.textContent = tab ? "Ver em gráfico" : "Ver em tabela"; fv.setAttribute("aria-pressed", tab); return; }
+  const s = e.target.closest(".subabas button");
+  if (!s) return;
+  const grupo = s.parentElement, sec = grupo.parentElement;
+  grupo.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b === s));
+  sec.querySelectorAll(":scope > [data-painel]").forEach(p => p.hidden = p.dataset.painel !== s.dataset.sub);
+});
+vista.addEventListener("input", e => {
+  if (e.target.id === "yt-q") { const q = e.target.value.toLowerCase(); vista.querySelectorAll("#yt-linhas tr").forEach(tr => tr.hidden = !tr.textContent.toLowerCase().includes(q)); }
+});
+function reels(){
+  const R = D.reelsIG, grade = $("#grade"), dentro = $("#dentro");
+  const br = n => n.toLocaleString("pt-BR");
+  const mostra = i => { const r = R[i];
+    grade.querySelectorAll(".cap").forEach(c => c.setAttribute("aria-current", c.dataset.i == i));
+    dentro.innerHTML = `<div class="dentro"><div class="foto" style="background:#2a2620 ${r.capa ? `url('${r.capa}')` : ""} center/cover"></div><div>
+      <div class="campo"><div class="lbl">Perfil</div><div class="val">${esc(r.de)} <small>${r.data.split("-").reverse().join("/")}</small></div></div>
+      <div class="campo"><div class="lbl">Views</div><div class="val">${br(r.views)} <small>${br(r.likes)} curtidas · ${br(r.coment)} coment.</small></div></div>
+      <div class="campo"><div class="lbl">Duração · palavra-chave</div><div class="val">${r.dur}s <small>${r.palavra ? "pede " + esc(r.palavra) : "sem palavra"}</small></div></div>
+      <p class="citacao">${esc(r.legenda || "(sem legenda)")}</p><a class="link" href="${esc(r.url)}" target="_blank" rel="noopener">abrir no Instagram</a></div></div>`; };
+  const filtra = () => {
+    const h = $("#f-perfil button[data-v][aria-pressed='true']")?.dataset.v || "", pal = $("#f-pal").getAttribute("aria-pressed") === "true";
+    grade.querySelectorAll(".cap").forEach(c => { const r = R[c.dataset.i]; c.hidden = (h && r.h !== h) || (pal && !r.palavra); });
+  };
+  grade.addEventListener("click", e => { const c = e.target.closest(".cap"); if (c) mostra(+c.dataset.i); });
+  $("#f-perfil").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+    if (b.id === "f-pal") b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true");
+    else $("#f-perfil").querySelectorAll("button[data-v]").forEach(x => x.setAttribute("aria-pressed", x === b));
+    filtra(); });
+  mostra(0);
+}
+abrir(location.hash.slice(1));
+</script>

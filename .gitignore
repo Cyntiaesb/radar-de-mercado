@@ -1,0 +1,12 @@
+.env
+coletas/
+saidas/
+__pycache__/
+*.pyc
+.venv/
+painel/*
+!painel/.gitkeep
+!painel/exemplo.html
+especialistas/*
+!especialistas/_novo.py
+!especialistas/exemplo.py
